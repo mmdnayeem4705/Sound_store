@@ -2,57 +2,30 @@
 require("includes/common.php");
 session_start();
 
-// Enable error reporting for debugging purposes
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
-// Database connection details
-$servername = "localhost";  
-$username = "root";  
-$password = "";  
-$dbname = "sound_store";  
-
-// Create a connection
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Check connection
-if ($conn->connect_error) {  
-    die("Failed to Connect: " . $conn->connect_error);  
-} else {
-    echo "Database connected successfully<br>";
-}
-
-// Debugging: Check if the 'responses' table exists
+// Check if the 'responses' table exists
 $sqlCheck = "SHOW TABLES LIKE 'responses'";
-$resultCheck = $conn->query($sqlCheck);
-if ($resultCheck && $resultCheck->num_rows > 0) {
-    echo "Table 'responses' exists.<br>";
-} else {
+$resultCheck = mysqli_query($con, $sqlCheck);
+if (!$resultCheck || mysqli_num_rows($resultCheck) === 0) {
     die("Table 'responses' does not exist. Please create it in the database.");
 }
 
 // Handling form submission for chatbot messages
 $chatResponse = "";
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['message'])) {
-    $userMessage = strtolower(trim($conn->real_escape_string($_POST['message'])));
+    $userMessage = strtolower(trim(mysqli_real_escape_string($con, $_POST['message'])));
     
-    // Query for a response that matches the user's input
     $sql = "SELECT response FROM responses WHERE LOWER(keyword) LIKE '%$userMessage%' LIMIT 1";
-    $result = $conn->query($sql);
+    $result = mysqli_query($con, $sql);
 
-    if ($result && $result->num_rows > 0) {
-        // Output the first matching response
-        $row = $result->fetch_assoc();
+    if ($result && mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
         $chatResponse = "Chatbot: " . $row['response'];
     } else {
         $chatResponse = "Chatbot: I'm sorry, I don't understand that. Can you rephrase?";
-        echo "Query executed: $sql<br>"; // Debugging: shows SQL query
-        echo "No response found for sanitized input: $userMessage<br>"; // Debugging: processed input
     }
 }
 
-// Close the connection
-$conn->close();  
+mysqli_close($con);
 ?>
 <!DOCTYPE html>
 <html lang="en">

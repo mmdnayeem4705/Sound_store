@@ -147,7 +147,7 @@
                         <div class="form-check">
                         <input type="checkbox" class="form-check-input" required>
                         <label for="checkbox" class="form-check-label">
-    <a href="includes\terms.html" style="text-decoration: none; color: inherit;">Agree to terms and conditions</a>
+    <a href="includes/terms.html" style="text-decoration: none; color: inherit;">Agree to terms and conditions</a>
 </label>
 
                     </div>
@@ -165,17 +165,4 @@
 <!--Signup modal ends-->
 
 <?php
-// Database connection details
-$servername = "localhost"; // Usually 'localhost' for local servers
-$username = "root";        // Default username in XAMPP is 'root'
-$password = "";            // Use an empty string if root has no password
-$dbname = "ecommerce";     // Replace with the name of your database
-
-// Create the connection
-$connection = mysqli_connect($servername, $username, $password, $dbname);
-
-// Check the connection
-if (!$connection) {
-    die("Connection failed: " . mysqli_connect_error());
-}
 ?>

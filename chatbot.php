@@ -1,38 +1,22 @@
-<?php  
-$servername = "localhost";  
-$username = "root";  
-$password = "";  
-$dbname = "ecommerce";  // Updated to use the ecommerce database
+<?php
+require("includes/common.php");
 
-// Create a connection
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Check connection
-if ($conn->connect_error) {  
-    echo "Failed to Connect: " . $conn->connect_error;  
-} 
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $userMessage = $_POST['message'];
+$chatResponse = "";
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['message'])) {
+    $userMessage = strtolower(trim(mysqli_real_escape_string($con, $_POST['message'])));
     
-    // Basic sanitization
-    $userMessage = $conn->real_escape_string($userMessage);
-    
-    // Query for a response that matches the user's input
-    $sql = "SELECT response FROM responses WHERE keyword LIKE '%$userMessage%' LIMIT 1";
-    $result = $conn->query($sql);
+    $sql = "SELECT response FROM responses WHERE LOWER(keyword) LIKE '%$userMessage%' LIMIT 1";
+    $result = mysqli_query($con, $sql);
 
-    if ($result->num_rows > 0) {
-        // Output the first matching response
-        $row = $result->fetch_assoc();
-        echo "Chatbot: " . $row['response'];
+    if ($result && mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+        $chatResponse = "Chatbot: " . $row['response'];
     } else {
-        echo "Chatbot: I'm sorry, I don't understand that. Can you rephrase?";
+        $chatResponse = "Chatbot: I'm sorry, I don't understand that. Can you rephrase?";
     }
 }
 
-// Close the connection
-$conn->close();  
+mysqli_close($con);
 ?>
 <!DOCTYPE html>
 <html lang="en">
